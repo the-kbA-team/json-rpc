@@ -24,8 +24,14 @@ Frédéric Guillot
 Installation with Composer
 --------------------------
 
+For PHP >= 5.4
 ```bash
-composer require fguillot/json-rpc @stable
+composer require fguillot/json-rpc
+```
+
+For PHP 5.3 (last supported version):
+```bash
+composer require fguillot/json-rpc 1.2.5
 ```
 
 Examples

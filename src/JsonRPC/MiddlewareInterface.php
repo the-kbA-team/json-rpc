@@ -16,10 +16,10 @@ interface MiddlewareInterface
     /**
      * Execute Middleware
      *
-     * @access public
      * @param  string $username
      * @param  string $password
      * @param  string $procedureName
+     *
      * @throws AccessDeniedException
      * @throws AuthenticationFailureException
      */

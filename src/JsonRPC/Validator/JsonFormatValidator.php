@@ -15,9 +15,8 @@ class JsonFormatValidator
     /**
      * Validate
      *
-     * @static
-     * @access public
      * @param  mixed $payload
+     *
      * @throws InvalidJsonFormatException
      */
     public static function validate($payload)

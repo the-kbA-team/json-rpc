@@ -115,27 +115,27 @@ class HttpClientTest extends \PHPUnit_Framework_TestCase
         self::$functions
             ->expects($this->at(1))
             ->method('stream_context_create')
-            ->with(array(
-                'http' => array(
+            ->with([
+                'http' => [
                     'method' => 'POST',
                     'protocol_version' => 1.1,
                     'timeout' => 5,
                     'max_redirects' => 2,
-                    'header' => implode("\r\n", array(
+                    'header' => implode("\r\n", [
                         'User-Agent: JSON-RPC PHP Client <https://github.com/fguillot/JsonRPC>',
                         'Content-Type: application/json',
                         'Accept: application/json',
                         'Connection: close',
                         'Content-Length: 4',
-                    )),
+                    ]),
                     'content' => 'test',
                     'ignore_errors' => true,
-                ),
-                'ssl' => array(
+                ],
+                'ssl' => [
                     'verify_peer' => true,
                     'verify_peer_name' => true,
-                )
-            ))
+                ]
+            ])
             ->will($this->returnValue('context'));
 
         self::$functions
@@ -169,7 +169,7 @@ class HttpClientTest extends \PHPUnit_Framework_TestCase
         self::$functions
             ->expects($this->at(2))
             ->method('curl_setopt_array')
-            ->with('curl', array(
+            ->with('curl', [
                 CURLOPT_URL => 'url',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_CONNECTTIMEOUT => 5,
@@ -177,18 +177,18 @@ class HttpClientTest extends \PHPUnit_Framework_TestCase
                 CURLOPT_SSL_VERIFYPEER => true,
                 CURLOPT_POST => true,
                 CURLOPT_POSTFIELDS => 'test',
-                CURLOPT_HTTPHEADER => array(
+                CURLOPT_HTTPHEADER => [
                     'User-Agent: JSON-RPC PHP Client <https://github.com/fguillot/JsonRPC>',
                     'Content-Type: application/json',
                     'Accept: application/json',
                     'Connection: close',
                     'Content-Length: 4',
-                ),
+                ],
                 CURLOPT_HEADERFUNCTION => function ($curl, $header) use (&$headers) {
                     $headers[] = $header;
                     return strlen($header);
                 }
-            ));
+            ]);
 
         self::$functions
             ->expects($this->at(3))

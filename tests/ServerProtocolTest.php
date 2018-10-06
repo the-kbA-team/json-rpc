@@ -194,7 +194,7 @@ class ServerProtocolTest extends \JsonRPC\Response\HeaderMockTest
         });
 
         $server->register('get_data', function() {
-            return array('hello', 5);
+            return ['hello', 5];
         });
 
         $server->attach(new C);

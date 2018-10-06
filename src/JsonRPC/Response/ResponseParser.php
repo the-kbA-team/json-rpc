@@ -3,8 +3,8 @@
 namespace JsonRPC\Response;
 
 use BadFunctionCallException;
-use InvalidArgumentException;
 use Exception;
+use InvalidArgumentException;
 use JsonRPC\Exception\InvalidJsonFormatException;
 use JsonRPC\Exception\InvalidJsonRpcFormatException;
 use JsonRPC\Exception\ResponseException;
@@ -21,7 +21,6 @@ class ResponseParser
     /**
      * Payload
      *
-     * @access private
      * @var mixed
      */
     private $payload;
@@ -36,8 +35,6 @@ class ResponseParser
     /**
      * Get new object instance
      *
-     * @static
-     * @access public
      * @return ResponseParser
      */
     public static function create()
@@ -49,6 +46,7 @@ class ResponseParser
      * Set Return Exception Or Throw It
      *
      * @param $returnException
+     *
      * @return ResponseParser
      */
     public function withReturnException($returnException)
@@ -60,8 +58,8 @@ class ResponseParser
     /**
      * Set payload
      *
-     * @access public
      * @param  mixed $payload
+     *
      * @return $this
      */
     public function withPayload($payload)
@@ -74,6 +72,7 @@ class ResponseParser
      * Parse response
      *
      * @return array|Exception|null
+     *
      * @throws InvalidJsonFormatException
      * @throws BadFunctionCallException
      * @throws InvalidJsonRpcFormatException
@@ -86,7 +85,7 @@ class ResponseParser
         JsonFormatValidator::validate($this->payload);
 
         if ($this->isBatchResponse()) {
-            $results = array();
+            $results = [];
 
             foreach ($this->payload as $response) {
                 $results[] = self::create()
@@ -115,7 +114,6 @@ class ResponseParser
     /**
      * Handle exceptions
      *
-     * @access private
      * @throws InvalidJsonFormatException
      * @throws InvalidJsonRpcFormatException
      * @throws ResponseException
@@ -144,7 +142,6 @@ class ResponseParser
     /**
      * Return true if we have a batch response
      *
-     * @access private
      * @return boolean
      */
     private function isBatchResponse()

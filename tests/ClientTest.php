@@ -19,18 +19,18 @@ class ClientTest extends PHPUnit_Framework_TestCase
     public function testSendBatch()
     {
         $client = new Client('', false, $this->httpClient);
-        $response = array(
-            array(
+        $response = [
+            [
                 'jsonrpc' => '2.0',
                 'result' => 'c',
                 'id' => 1,
-            ),
-            array(
+            ],
+            [
                 'jsonrpc' => '2.0',
                 'result' => 'd',
                 'id' => 2,
-            )
-        );
+            ]
+        ];
 
         $this->httpClient
             ->expects($this->once())
@@ -40,8 +40,8 @@ class ClientTest extends PHPUnit_Framework_TestCase
 
 
         $result = $client->batch()
-            ->execute('methodA', array('a' => 'b'))
-            ->execute('methodB', array('a' => 'b'))
+            ->execute('methodA', ['a' => 'b'])
+            ->execute('methodB', ['a' => 'b'])
             ->send();
 
         $this->assertEquals(array('c', 'd'), $result);
@@ -57,7 +57,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
             ->with($this->stringContains('{"jsonrpc":"2.0","method":"methodA","id":'))
             ->will($this->returnValue(array('jsonrpc' => '2.0', 'result' => 'foobar', 'id' => 1)));
 
-        $result = $client->execute('methodA', array('a' => 'b'));
+        $result = $client->execute('methodA', ['a' => 'b']);
         $this->assertEquals($result, 'foobar');
     }
 
@@ -69,16 +69,16 @@ class ClientTest extends PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('execute')
             ->with($this->stringContains('{"jsonrpc":"2.0","method":"methodA","id":'))
-            ->will($this->returnValue(array(
+            ->will($this->returnValue([
                 'jsonrpc' => '2.0',
-                'error' => array(
+                'error' => [
                     'code' => -32601,
                     'message' => 'Method not found',
-                ),
-            )));
+                ],
+            ]));
 
         $this->setExpectedException('BadFunctionCallException');
-        $client->execute('methodA', array('a' => 'b'));
+        $client->execute('methodA', ['a' => 'b']);
     }
 
     public function testSendRequestWithErrorAndReturnExceptionEnabled()
@@ -89,15 +89,15 @@ class ClientTest extends PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('execute')
             ->with($this->stringContains('{"jsonrpc":"2.0","method":"methodA","id":'))
-            ->will($this->returnValue(array(
+            ->will($this->returnValue([
                 'jsonrpc' => '2.0',
-                'error' => array(
+                'error' => [
                     'code' => -32601,
                     'message' => 'Method not found',
-                ),
-            )));
+                ],
+            ]));
 
-        $result = $client->execute('methodA', array('a' => 'b'));
+        $result = $client->execute('methodA', ['a' => 'b']);
         $this->assertInstanceOf('BadFunctionCallException', $result);
     }
 }

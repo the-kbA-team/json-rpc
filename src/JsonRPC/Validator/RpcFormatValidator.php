@@ -15,9 +15,8 @@ class RpcFormatValidator
     /**
      * Validate
      *
-     * @static
-     * @access public
      * @param  array $payload
+     *
      * @throws InvalidJsonRpcFormatException
      */
     public static function validate(array $payload)

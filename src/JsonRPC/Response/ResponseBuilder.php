@@ -24,7 +24,6 @@ class ResponseBuilder
     /**
      * Payload ID
      *
-     * @access protected
      * @var mixed
      */
     protected $id;
@@ -32,7 +31,6 @@ class ResponseBuilder
     /**
      * Payload ID
      *
-     * @access protected
      * @var mixed
      */
     protected $result;
@@ -40,7 +38,6 @@ class ResponseBuilder
     /**
      * Payload error code
      *
-     * @access protected
      * @var integer
      */
     protected $errorCode;
@@ -48,7 +45,6 @@ class ResponseBuilder
     /**
      * Payload error message
      *
-     * @access private
      * @var string
      */
     protected $errorMessage;
@@ -56,7 +52,6 @@ class ResponseBuilder
     /**
      * Payload error data
      *
-     * @access protected
      * @var mixed
      */
     protected $errorData;
@@ -64,17 +59,15 @@ class ResponseBuilder
     /**
      * HTTP Headers
      *
-     * @access protected
      * @var array
      */
-    protected $headers = array(
+    protected $headers = [
         'Content-Type' => 'application/json',
-    );
+    ];
 
     /**
      * HTTP status
      *
-     * @access protected
      * @var string
      */
     protected $status;
@@ -82,7 +75,6 @@ class ResponseBuilder
     /**
      * Exception
      *
-     * @access protected
      * @var ResponseException
      */
     protected $exception;
@@ -90,8 +82,6 @@ class ResponseBuilder
     /**
      * Get new object instance
      *
-     * @static
-     * @access public
      * @return ResponseBuilder
      */
     public static function create()
@@ -102,8 +92,8 @@ class ResponseBuilder
     /**
      * Set id
      *
-     * @access public
      * @param  mixed  $id
+     *
      * @return $this
      */
     public function withId($id)
@@ -115,8 +105,8 @@ class ResponseBuilder
     /**
      * Set result
      *
-     * @access public
      * @param  mixed $result
+     *
      * @return $this
      */
     public function withResult($result)
@@ -128,10 +118,10 @@ class ResponseBuilder
     /**
      * Set error
      *
-     * @access public
      * @param  integer $code
      * @param  string  $message
      * @param  string  $data
+     *
      * @return $this
      */
     public function withError($code, $message, $data = '')
@@ -145,8 +135,8 @@ class ResponseBuilder
     /**
      * Set exception
      *
-     * @access public
      * @param  Exception $exception
+     *
      * @return $this
      */
     public function withException(Exception $exception)
@@ -158,9 +148,9 @@ class ResponseBuilder
     /**
      * Add HTTP header
      *
-     * @access public
      * @param  string $name
      * @param  string $value
+     *
      * @return $this
      */
     public function withHeader($name, $value)
@@ -172,8 +162,8 @@ class ResponseBuilder
     /**
      * Add HTTP Status
      *
-     * @access public
      * @param  string $status
+     *
      * @return $this
      */
     public function withStatus($status)
@@ -185,7 +175,6 @@ class ResponseBuilder
     /**
      * Get status
      *
-     * @access public
      * @return string
      */
     public function getStatus()
@@ -196,7 +185,6 @@ class ResponseBuilder
     /**
      * Get headers
      *
-     * @access public
      * @return string[]
      */
     public function getHeaders()
@@ -207,8 +195,9 @@ class ResponseBuilder
     /**
      * Build response
      *
-     * @access public
      * @return string
+     *
+     * @throws ResponseEncodingFailureException
      */
     public function build()
     {
@@ -228,7 +217,6 @@ class ResponseBuilder
     /**
      * Send HTTP headers
      *
-     * @access public
      * @return $this
      */
     public function sendHeaders()
@@ -247,12 +235,11 @@ class ResponseBuilder
     /**
      * Build response payload
      *
-     * @access protected
      * @return array
      */
     protected function buildResponse()
     {
-        $response = array('jsonrpc' => '2.0');
+        $response = ['jsonrpc' => '2.0'];
         $this->handleExceptions();
 
         if (! empty($this->errorMessage)) {
@@ -268,15 +255,14 @@ class ResponseBuilder
     /**
      * Build response error payload
      *
-     * @access protected
      * @return array
      */
     protected function buildErrorResponse()
     {
-        $response = array(
+        $response = [
             'code' => $this->errorCode,
             'message' => $this->errorMessage,
-        );
+        ];
 
         if (! empty($this->errorData)) {
             $response['data'] = $this->errorData;
@@ -287,8 +273,6 @@ class ResponseBuilder
 
     /**
      * Transform exceptions to JSON-RPC errors
-     *
-     * @access protected
      */
     protected function handleExceptions()
     {

@@ -15,10 +15,9 @@ class HostValidator
     /**
      * Validate
      *
-     * @static
-     * @access public
      * @param  array  $hosts
      * @param  string $remoteAddress
+     *
      * @throws AccessDeniedException
      */
     public static function validate(array $hosts, $remoteAddress)
@@ -35,8 +34,10 @@ class HostValidator
     
     /**
      * Validate remoteAddress match host
+     *
      * @param $remoteAddress
      * @param $host
+     *
      * @return bool
      */
     public static function ipMatch($remoteAddress, $host)
@@ -58,10 +59,10 @@ class HostValidator
 
     /**
      * validate the ipAddress in network
-     *  192.168.1.1/24
-     * @param $clientIp
-     * @param $networkIp
-     * @param $mask
+     *
+     * @param string $clientIp
+     * @param string $networkIp
+     * @param string $mask
      *
      * @return bool
      */

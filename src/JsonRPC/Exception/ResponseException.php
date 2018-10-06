@@ -15,16 +15,12 @@ class ResponseException extends RpcCallFailedException
     /**
      * A value that contains additional information about the error.
      *
-     * @access protected
      * @link http://www.jsonrpc.org/specification#error_object
      * @var mixed
      */
     protected $data;
 
     /**
-     * Constructor
-     *
-     * @access public
      * @param string    $message  [optional] The Exception message to throw.
      * @param int       $code     [optional] The Exception code.
      * @param Exception $previous [optional] The previous exception used for the exception chaining. Since 5.3.0
@@ -39,8 +35,8 @@ class ResponseException extends RpcCallFailedException
     /**
      * Attach additional information
      *
-     * @access public
      * @param mixed $data [optional] A value that contains additional information about the error.
+     *
      * @return \JsonRPC\Exception\ResponseException
      */
     public function setData($data = null)
@@ -52,7 +48,6 @@ class ResponseException extends RpcCallFailedException
     /**
      * Get additional information
      *
-     * @access public
      * @return mixed|null
      */
     public function getData()

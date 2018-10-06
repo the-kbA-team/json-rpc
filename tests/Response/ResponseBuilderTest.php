@@ -71,7 +71,7 @@ class ResponseBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('HTTP/1.0 403 Forbidden', $responseBuilder->getStatus());
 
         $this->assertEquals(
-            array('Content-Type' => 'application/json'),
+            ['Content-Type' => 'application/json'],
             $responseBuilder->getHeaders()
         );
     }
@@ -89,7 +89,7 @@ class ResponseBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('HTTP/1.0 401 Unauthorized', $responseBuilder->getStatus());
 
         $this->assertEquals(
-            array('Content-Type' => 'application/json', 'WWW-Authenticate' => 'Basic realm="JsonRPC"'),
+            ['Content-Type' => 'application/json', 'WWW-Authenticate' => 'Basic realm="JsonRPC"'],
             $responseBuilder->getHeaders()
         );
     }

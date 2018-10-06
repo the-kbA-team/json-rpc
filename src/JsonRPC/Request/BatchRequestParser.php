@@ -13,12 +13,13 @@ class BatchRequestParser extends RequestParser
     /**
      * Parse incoming request
      *
-     * @access public
      * @return string
+     *
+     * @throws \Exception
      */
     public function parse()
     {
-        $responses = array();
+        $responses = [];
 
         foreach ($this->payload as $payload) {
             $responses[] = RequestParser::create()
@@ -43,9 +44,8 @@ class BatchRequestParser extends RequestParser
      *   3 => '...',
      * ]
      *
-     * @static
-     * @access public
      * @param  array $payload
+     *
      * @return bool
      */
     public static function isBatchRequest(array $payload)

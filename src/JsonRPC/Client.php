@@ -18,7 +18,6 @@ class Client
      * If the only argument passed to a function is an array
      * assume it contains named arguments
      *
-     * @access private
      * @var boolean
      */
     private $isNamedArguments = true;
@@ -26,7 +25,6 @@ class Client
     /**
      * Do not immediately throw an exception on error. Return it instead.
      *
-     * @access public
      * @var boolean
      */
     private $returnException = false;
@@ -34,7 +32,6 @@ class Client
     /**
      * True for a batch request
      *
-     * @access private
      * @var boolean
      */
     private $isBatch = false;
@@ -42,23 +39,18 @@ class Client
     /**
      * Batch payload
      *
-     * @access private
      * @var array
      */
-    private $batch = array();
+    private $batch = [];
 
     /**
      * Http Client
      *
-     * @access private
      * @var HttpClient
      */
     private $httpClient;
 
     /**
-     * Constructor
-     *
-     * @access public
      * @param  string      $url               Server URL
      * @param  bool        $returnException   Return exceptions
      * @param  HttpClient  $httpClient        HTTP client object
@@ -72,19 +64,18 @@ class Client
     /**
      * Arguments passed are always positional
      *
-     * @access public
      * @return $this
      */
     public function withPositionalArguments()
     {
         $this->isNamedArguments = false;
+
         return $this;
     }
 
     /**
      * Get HTTP Client
      *
-     * @access public
      * @return HttpClient
      */
     public function getHttpClient()
@@ -95,9 +86,9 @@ class Client
     /**
      * Set username and password
      *
-     * @access public
      * @param  string $username
      * @param  string $password
+     *
      * @return $this
      */
     public function authentication($username, $password)
@@ -112,10 +103,12 @@ class Client
     /**
      * Automatic mapping of procedures
      *
-     * @access public
      * @param  string   $method   Procedure name
      * @param  array    $params   Procedure arguments
-     * @return mixed
+     *
+     * @return Exception|Client
+     *
+     * @throws Exception
      */
     public function __call($method, array $params)
     {
@@ -129,40 +122,44 @@ class Client
     /**
      * Start a batch request
      *
-     * @access public
      * @return Client
      */
     public function batch()
     {
         $this->isBatch = true;
-        $this->batch = array();
+        $this->batch = [];
+
         return $this;
     }
 
     /**
      * Send a batch request
      *
-     * @access public
-     * @return array
+     * @return Exception|Client
+     *
+     * @throws Exception
      */
     public function send()
     {
         $this->isBatch = false;
+
         return $this->sendPayload('['.implode(', ', $this->batch).']');
     }
 
     /**
      * Execute a procedure
      *
-     * @access public
      * @param  string      $procedure Procedure name
      * @param  array       $params    Procedure arguments
      * @param  array       $reqattrs
      * @param  string|null $requestId Request Id
      * @param  string[]    $headers   Headers for this request
-     * @return mixed
+     *
+     * @return $this|Exception|Client
+     *
+     * @throws Exception
      */
-    public function execute($procedure, array $params = array(), array $reqattrs = array(), $requestId = null, array $headers = array())
+    public function execute($procedure, array $params = [], array $reqattrs = [], $requestId = null, array $headers = [])
     {
         $payload = RequestBuilder::create()
             ->withProcedure($procedure)
@@ -173,6 +170,7 @@ class Client
 
         if ($this->isBatch) {
             $this->batch[] = $payload;
+
             return $this;
         }
 
@@ -182,13 +180,14 @@ class Client
     /**
      * Send payload
      *
-     * @access private
-     * @throws Exception
      * @param  string   $payload
      * @param  string[] $headers
+     *
      * @return Exception|Client
+     *
+     * @throws Exception
      */
-    private function sendPayload($payload, array $headers = array())
+    private function sendPayload($payload, array $headers = [])
     {
         return ResponseParser::create()
             ->withReturnException($this->returnException)

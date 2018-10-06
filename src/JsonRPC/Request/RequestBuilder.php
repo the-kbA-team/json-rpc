@@ -13,7 +13,6 @@ class RequestBuilder
     /**
      * Request ID
      *
-     * @access private
      * @var mixed
      */
     private $id = null;
@@ -21,7 +20,6 @@ class RequestBuilder
     /**
      * Method name
      *
-     * @access private
      * @var string
      */
     private $procedure = '';
@@ -29,24 +27,20 @@ class RequestBuilder
     /**
      * Method arguments
      *
-     * @access private
      * @var array
      */
-    private $params = array();
+    private $params = [];
 
     /**
      * Additional request attributes
      *
-     * @access private
      * @var array
      */
-    private $reqattrs = array();
+    private $reqattrs = [];
 
     /**
      * Get new object instance
      *
-     * @static
-     * @access public
      * @return RequestBuilder
      */
     public static function create()
@@ -57,8 +51,8 @@ class RequestBuilder
     /**
      * Set id
      *
-     * @access public
      * @param  null $id
+     *
      * @return RequestBuilder
      */
     public function withId($id)
@@ -70,8 +64,8 @@ class RequestBuilder
     /**
      * Set method
      *
-     * @access public
      * @param  string $procedure
+     *
      * @return RequestBuilder
      */
     public function withProcedure($procedure)
@@ -83,8 +77,8 @@ class RequestBuilder
     /**
      * Set parameters
      *
-     * @access public
      * @param  array $params
+     *
      * @return RequestBuilder
      */
     public function withParams(array $params)
@@ -96,8 +90,8 @@ class RequestBuilder
     /**
      * Set additional request attributes
      *
-     * @access public
      * @param  array $reqattrs
+     *
      * @return RequestBuilder
      */
     public function withRequestAttributes(array $reqattrs)
@@ -109,16 +103,15 @@ class RequestBuilder
     /**
      * Build the payload
      *
-     * @access public
      * @return string
      */
     public function build()
     {
-        $payload = array_merge_recursive($this->reqattrs, array(
+        $payload = array_merge_recursive($this->reqattrs, [
             'jsonrpc' => '2.0',
             'method' => $this->procedure,
             'id' => $this->id ?: mt_rand(),
-        ));
+        ]);
 
         if (! empty($this->params)) {
             $payload['params'] = $this->params;

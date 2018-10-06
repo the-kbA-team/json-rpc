@@ -29,9 +29,9 @@ class ServerTest extends HeaderMockTest
 
     public function testCustomAuthenticationHeader()
     {
-        $env = array(
+        $env = [
             'HTTP_X_AUTH' => base64_encode('myuser:mypassword'),
-        );
+        ];
 
         $server = new Server($this->payload, $env);
         $server->setAuthenticationHeader('X-Auth');
@@ -52,7 +52,7 @@ class ServerTest extends HeaderMockTest
         $server = new Server($this->payload);
         $this->assertNull($server->getUsername());
 
-        $server = new Server($this->payload, array('PHP_AUTH_USER' => 'username'));
+        $server = new Server($this->payload, ['PHP_AUTH_USER' => 'username']);
         $this->assertEquals('username', $server->getUsername());
     }
 
@@ -61,7 +61,7 @@ class ServerTest extends HeaderMockTest
         $server = new Server($this->payload);
         $this->assertNull($server->getPassword());
 
-        $server = new Server($this->payload, array('PHP_AUTH_PW' => 'password'));
+        $server = new Server($this->payload, ['PHP_AUTH_PW' => 'password']);
         $this->assertEquals('password', $server->getPassword());
     }
 
@@ -90,7 +90,7 @@ class ServerTest extends HeaderMockTest
         $requestParser->method('withMiddlewareHandler')->willReturn($requestParser);
         $requestParser->method('withLocalException')->willReturn($requestParser);
 
-        $server = new Server($this->payload, array(), null, $requestParser);
+        $server = new Server($this->payload, [], null, $requestParser);
 
         $requestParser->expects($this->once())
             ->method('parse');
@@ -108,7 +108,7 @@ class ServerTest extends HeaderMockTest
         $batchRequestParser->method('withMiddlewareHandler')->willReturn($batchRequestParser);
         $batchRequestParser->method('withLocalException')->willReturn($batchRequestParser);
 
-        $server = new Server('["...", "..."]', array(), null, null, $batchRequestParser);
+        $server = new Server('["...", "..."]', [], null, null, $batchRequestParser);
 
         $batchRequestParser->expects($this->once())
             ->method('parse');
@@ -124,7 +124,7 @@ class ServerTest extends HeaderMockTest
         $responseBuilder->expects($this->once())
             ->method('sendHeaders');
 
-        $server = new Server($this->payload, array(), $responseBuilder);
+        $server = new Server($this->payload, [], $responseBuilder);
         $server->execute();
     }
 
@@ -141,7 +141,7 @@ class ServerTest extends HeaderMockTest
         $batchRequestParser->method('withMiddlewareHandler')->willReturn($batchRequestParser);
         $batchRequestParser->method('withLocalException')->willReturn($batchRequestParser);
 
-        $server = new Server('["...", "..."]', array(), null, null, $batchRequestParser, $procedureHandler);
+        $server = new Server('["...", "..."]', [], null, null, $batchRequestParser, $procedureHandler);
 
         $batchRequestParser->expects($this->once())
             ->method('parse');

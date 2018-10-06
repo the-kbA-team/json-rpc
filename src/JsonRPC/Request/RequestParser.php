@@ -3,8 +3,6 @@
 namespace JsonRPC\Request;
 
 use Exception;
-use JsonRPC\Exception\AccessDeniedException;
-use JsonRPC\Exception\AuthenticationFailureException;
 use JsonRPC\Exception\InvalidJsonRpcFormatException;
 use JsonRPC\MiddlewareHandler;
 use JsonRPC\ProcedureHandler;
@@ -23,7 +21,6 @@ class RequestParser
     /**
      * Request payload
      *
-     * @access protected
      * @var mixed
      */
     protected $payload;
@@ -31,18 +28,16 @@ class RequestParser
     /**
      * List of exceptions that should not be relayed to the client
      *
-     * @access protected
-     * @var array()
+     * @var array
      */
-    protected $localExceptions = array(
+    protected $localExceptions = [
         'JsonRPC\Exception\AuthenticationFailureException',
         'JsonRPC\Exception\AccessDeniedException',
-    );
+    ];
 
     /**
      * ProcedureHandler
      *
-     * @access protected
      * @var ProcedureHandler
      */
     protected $procedureHandler;
@@ -50,7 +45,6 @@ class RequestParser
     /**
      * MiddlewareHandler
      *
-     * @access protected
      * @var MiddlewareHandler
      */
     protected $middlewareHandler;
@@ -58,8 +52,6 @@ class RequestParser
     /**
      * Get new object instance
      *
-     * @static
-     * @access public
      * @return RequestParser
      */
     public static function create()
@@ -70,8 +62,8 @@ class RequestParser
     /**
      * Set payload
      *
-     * @access public
      * @param  mixed $payload
+     *
      * @return $this
      */
     public function withPayload($payload)
@@ -83,8 +75,8 @@ class RequestParser
     /**
      * Exception classes that should not be relayed to the client
      *
-     * @access public
      * @param  mixed $exception
+     *
      * @return $this
      */
     public function withLocalException($exception)
@@ -101,8 +93,8 @@ class RequestParser
     /**
      * Set procedure handler
      *
-     * @access public
      * @param  ProcedureHandler $procedureHandler
+     *
      * @return $this
      */
     public function withProcedureHandler(ProcedureHandler $procedureHandler)
@@ -114,8 +106,8 @@ class RequestParser
     /**
      * Set middleware handler
      *
-     * @access public
      * @param  MiddlewareHandler $middlewareHandler
+     *
      * @return $this
      */
     public function withMiddlewareHandler(MiddlewareHandler $middlewareHandler)
@@ -127,10 +119,9 @@ class RequestParser
     /**
      * Parse incoming request
      *
-     * @access public
      * @return string
-     * @throws AccessDeniedException
-     * @throws AuthenticationFailureException
+     *
+     * @throws Exception
      */
     public function parse()
     {
@@ -145,7 +136,7 @@ class RequestParser
 
             $result = $this->procedureHandler->executeProcedure(
                 $this->payload['method'],
-                empty($this->payload['params']) ? array() : $this->payload['params']
+                empty($this->payload['params']) ? [] : $this->payload['params']
             );
 
             if (! $this->isNotification()) {
@@ -164,9 +155,10 @@ class RequestParser
     /**
      * Handle exceptions
      *
-     * @access protected
      * @param  Exception $e
+     *
      * @return string
+     *
      * @throws Exception
      */
     protected function handleExceptions(Exception $e)
@@ -190,7 +182,6 @@ class RequestParser
     /**
      * Return true if the message is a notification
      *
-     * @access protected
      * @return bool
      */
     protected function isNotification()

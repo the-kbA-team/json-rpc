@@ -19,31 +19,27 @@ class ProcedureHandler
     /**
      * List of procedures
      *
-     * @access protected
      * @var array
      */
-    protected $callbacks = array();
+    protected $callbacks = [];
 
     /**
      * List of classes
      *
-     * @access protected
      * @var array
      */
-    protected $classes = array();
+    protected $classes = [];
 
     /**
      * List of instances
      *
-     * @access protected
      * @var array
      */
-    protected $instances = array();
+    protected $instances = [];
 
     /**
      * Before method name to call
      *
-     * @access protected
      * @var string
      */
     protected $beforeMethodName = '';
@@ -51,24 +47,25 @@ class ProcedureHandler
     /**
      * Register a new procedure
      *
-     * @access public
      * @param  string   $procedure       Procedure name
      * @param  closure  $callback        Callback
+     *
      * @return $this
      */
     public function withCallback($procedure, Closure $callback)
     {
         $this->callbacks[$procedure] = $callback;
+
         return $this;
     }
 
     /**
      * Bind a procedure to a class
      *
-     * @access public
      * @param  string   $procedure    Procedure name
      * @param  mixed    $class        Class name or instance
      * @param  string   $method       Procedure name
+     *
      * @return $this
      */
     public function withClassAndMethod($procedure, $class, $method = '')
@@ -77,41 +74,44 @@ class ProcedureHandler
             $method = $procedure;
         }
 
-        $this->classes[$procedure] = array($class, $method);
+        $this->classes[$procedure] = [$class, $method];
+
         return $this;
     }
 
     /**
      * Bind a class instance
      *
-     * @access public
      * @param  mixed   $instance
+     *
      * @return $this
      */
     public function withObject($instance)
     {
         $this->instances[] = $instance;
+
         return $this;
     }
 
     /**
      * Set a before method to call
      *
-     * @access public
      * @param  string $methodName
+     *
      * @return $this
      */
     public function withBeforeMethod($methodName)
     {
         $this->beforeMethodName = $methodName;
+
         return $this;
     }
 
     /**
      * Register multiple procedures from array
      *
-     * @access public
      * @param  array  $callbacks Array with procedure names (array keys) and callbacks (array values)
+     *
      * @return $this
      */
     public function withCallbackArray($callbacks)
@@ -126,8 +126,8 @@ class ProcedureHandler
     /**
      * Bind multiple procedures to classes from array
      *
-     * @access public
      * @param  array  $callbacks Array with procedure names (array keys) and class and method names (array values)
+     *
      * @return $this
      */
     public function withClassAndMethodArray($callbacks)
@@ -142,16 +142,21 @@ class ProcedureHandler
     /**
      * Execute the procedure
      *
-     * @access public
      * @param  string   $procedure    Procedure name
      * @param  array    $params       Procedure params
+     *
      * @return mixed
+     *
+     * @throws \ReflectionException
      */
-    public function executeProcedure($procedure, array $params = array())
+    public function executeProcedure($procedure, array $params = [])
     {
         if (isset($this->callbacks[$procedure])) {
             return $this->executeCallback($this->callbacks[$procedure], $params);
-        } elseif (isset($this->classes[$procedure]) && method_exists($this->classes[$procedure][0], $this->classes[$procedure][1])) {
+        } elseif (
+            isset($this->classes[$procedure])
+            && method_exists($this->classes[$procedure][0], $this->classes[$procedure][1])
+        ) {
             return $this->executeMethod($this->classes[$procedure][0], $this->classes[$procedure][1], $params);
         }
 
@@ -167,10 +172,12 @@ class ProcedureHandler
     /**
      * Execute a callback
      *
-     * @access public
      * @param  Closure   $callback     Callback
      * @param  array     $params       Procedure params
+     *
      * @return mixed
+     *
+     * @throws \ReflectionException
      */
     public function executeCallback(Closure $callback, $params)
     {
@@ -189,11 +196,13 @@ class ProcedureHandler
     /**
      * Execute a method
      *
-     * @access public
      * @param  mixed     $class        Class name or instance
      * @param  string    $method       Method name
      * @param  array     $params       Procedure params
+     *
      * @return mixed
+     *
+     * @throws \ReflectionException
      */
     public function executeMethod($class, $method, $params)
     {
@@ -215,25 +224,24 @@ class ProcedureHandler
     /**
      * Execute before method if defined
      *
-     * @access public
      * @param  mixed  $object
      * @param  string $method
      */
     public function executeBeforeMethod($object, $method)
     {
         if ($this->beforeMethodName !== '' && method_exists($object, $this->beforeMethodName)) {
-            call_user_func_array(array($object, $this->beforeMethodName), array($method));
+            call_user_func_array([$object, $this->beforeMethodName], [$method]);
         }
     }
 
     /**
      * Get procedure arguments
      *
-     * @access public
      * @param  array   $requestParams    Incoming arguments
      * @param  array   $methodParams     Procedure arguments
      * @param  integer $nbRequiredParams Number of required parameters
      * @param  integer $nbMaxParams      Maximum number of parameters
+     *
      * @return array
      */
     public function getArguments(array $requestParams, array $methodParams, $nbRequiredParams, $nbMaxParams)
@@ -258,8 +266,8 @@ class ProcedureHandler
     /**
      * Return true if we have positional parameters
      *
-     * @access public
      * @param  array    $request_params      Incoming arguments
+     *
      * @return bool
      */
     public function isPositionalArguments(array $request_params)
@@ -270,14 +278,14 @@ class ProcedureHandler
     /**
      * Get named arguments
      *
-     * @access public
      * @param  array $requestParams Incoming arguments
      * @param  array $methodParams  Procedure arguments
+     *
      * @return array
      */
     public function getNamedArguments(array $requestParams, array $methodParams)
     {
-        $params = array();
+        $params = [];
 
         foreach ($methodParams as $p) {
             $name = $p->getName();

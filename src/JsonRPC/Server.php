@@ -22,31 +22,27 @@ class Server
     /**
      * Allowed hosts
      *
-     * @access protected
      * @var array
      */
-    protected $hosts = array();
+    protected $hosts = [];
 
     /**
      * Data received from the client
      *
-     * @access protected
      * @var array
      */
-    protected $payload = array();
+    protected $payload = [];
 
     /**
      * List of exceptions that should not be relayed to the client
      *
-     * @access protected
-     * @var array()
+     * @var array
      */
-    protected $localExceptions = array();
+    protected $localExceptions = [];
 
     /**
      * Username
      *
-     * @access protected
      * @var string
      */
     protected $username = '';
@@ -54,7 +50,6 @@ class Server
     /**
      * Password
      *
-     * @access protected
      * @var string
      */
     protected $password = '';
@@ -62,15 +57,13 @@ class Server
     /**
      * Allowed users
      *
-     * @access protected
      * @var array
      */
-    protected $users = array();
+    protected $users = [];
 
     /**
      * $_SERVER
      *
-     * @access protected
      * @var array
      */
     protected $serverVariable;
@@ -78,7 +71,6 @@ class Server
     /**
      * ProcedureHandler object
      *
-     * @access protected
      * @var ProcedureHandler
      */
     protected $procedureHandler;
@@ -86,7 +78,6 @@ class Server
     /**
      * MiddlewareHandler object
      *
-     * @access protected
      * @var MiddlewareHandler
      */
     protected $middlewareHandler;
@@ -94,7 +85,6 @@ class Server
     /**
      * Response builder
      *
-     * @access protected
      * @var ResponseBuilder
      */
     protected $responseBuilder;
@@ -102,24 +92,18 @@ class Server
     /**
      * Response builder
      *
-     * @access protected
      * @var RequestParser
      */
     protected $requestParser;
 
     /**
-     *
      * Batch request parser
      *
-     * @access protected
      * @var BatchRequestParser
      */
     protected $batchRequestParser;
 
     /**
-     * Constructor
-     *
-     * @access public
      * @param  string              $request
      * @param  array               $server
      * @param  ResponseBuilder     $responseBuilder
@@ -130,7 +114,7 @@ class Server
      */
     public function __construct(
         $request = '',
-        array $server = array(),
+        array $server = [],
         ResponseBuilder $responseBuilder = null,
         RequestParser $requestParser = null,
         BatchRequestParser $batchRequestParser = null,
@@ -154,8 +138,8 @@ class Server
     /**
      * Define alternative authentication header
      *
-     * @access public
      * @param  string   $header   Header name
+     *
      * @return $this
      */
     public function setAuthenticationHeader($header)
@@ -175,7 +159,6 @@ class Server
     /**
      * Get ProcedureHandler
      *
-     * @access public
      * @return ProcedureHandler
      */
     public function getProcedureHandler()
@@ -186,7 +169,6 @@ class Server
     /**
      * Get MiddlewareHandler
      *
-     * @access public
      * @return MiddlewareHandler
      */
     public function getMiddlewareHandler()
@@ -197,7 +179,6 @@ class Server
     /**
      * Get username
      *
-     * @access public
      * @return string
      */
     public function getUsername()
@@ -208,7 +189,6 @@ class Server
     /**
      * Get password
      *
-     * @access public
      * @return string
      */
     public function getPassword()
@@ -219,92 +199,102 @@ class Server
     /**
      * IP based client restrictions
      *
-     * @access public
      * @param  array   $hosts   List of hosts
+     *
      * @return $this
      */
     public function allowHosts(array $hosts)
     {
         $this->hosts = $hosts;
+
         return $this;
     }
 
     /**
      * HTTP Basic authentication
      *
-     * @access public
      * @param  array   $users   Dictionary of username/password
+     *
      * @return $this
      */
     public function authentication(array $users)
     {
         $this->users = $users;
+
         return $this;
     }
 
     /**
      * Register a new procedure
      *
-     * @access public
      * @deprecated Use $server->getProcedureHandler()->withCallback($procedure, $callback)
+     *
      * @param  string   $procedure       Procedure name
      * @param  closure  $callback        Callback
+     *
      * @return $this
      */
     public function register($procedure, Closure $callback)
     {
         $this->procedureHandler->withCallback($procedure, $callback);
+
         return $this;
     }
 
     /**
      * Bind a procedure to a class
      *
-     * @access public
      * @deprecated Use $server->getProcedureHandler()->withClassAndMethod($procedure, $class, $method);
+     *
      * @param  string   $procedure    Procedure name
      * @param  mixed    $class        Class name or instance
      * @param  string   $method       Procedure name
+     *
      * @return $this
      */
     public function bind($procedure, $class, $method = '')
     {
         $this->procedureHandler->withClassAndMethod($procedure, $class, $method);
+
         return $this;
     }
 
     /**
      * Bind a class instance
      *
-     * @access public
      * @deprecated Use $server->getProcedureHandler()->withObject($instance);
+     *
      * @param  mixed   $instance    Instance name
+     *
      * @return $this
      */
     public function attach($instance)
     {
         $this->procedureHandler->withObject($instance);
+
         return $this;
     }
 
     /**
      * Exception classes that should not be relayed to the client
      *
-     * @access public
      * @param  Exception|string $exception
+     *
      * @return $this
      */
     public function withLocalException($exception)
     {
         $this->localExceptions[] = $exception;
+
         return $this;
     }
 
     /**
      * Parse incoming requests
      *
-     * @access public
      * @return string
+     *
+     * @throws Exception
      */
     public function execute()
     {
@@ -325,15 +315,17 @@ class Server
         }
 
         $this->responseBuilder->sendHeaders();
+
         return $response;
     }
 
     /**
      * Handle exceptions
-     * 
-     * @access protected
+     *
      * @param  Exception $e
+     *
      * @return string
+     *
      * @throws Exception
      */
     protected function handleExceptions(Exception $e)
@@ -350,8 +342,9 @@ class Server
     /**
      * Parse incoming request
      *
-     * @access protected
      * @return string
+     *
+     * @throws Exception
      */
     protected function parseRequest()
     {
@@ -375,8 +368,8 @@ class Server
     /**
      * Check existence and get value of server variable
      *
-     * @access protected
      * @param  string $variable
+     *
      * @return string|null
      */
     protected function getServerVariable($variable)

@@ -72,12 +72,12 @@ class ProcedureHandlerTest extends PHPUnit_Framework_TestCase
     {
         $handler = new ProcedureHandler;
         $this->assertFalse($handler->isPositionalArguments(
-            array('a' => 'b', 'c' => 'd')
+            ['a' => 'b', 'c' => 'd']
         ));
 
         $handler = new ProcedureHandler;
         $this->assertTrue($handler->isPositionalArguments(
-            array('a', 'b', 'c')
+            ['a', 'b', 'c']
         ));
     }
 
@@ -87,10 +87,10 @@ class ProcedureHandlerTest extends PHPUnit_Framework_TestCase
         $handler->withClassAndMethod('getAllA', 'A', 'getAll');
         $handler->withClassAndMethod('getAllB', 'B', 'getAll');
         $handler->withClassAndMethod('getAllC', new B, 'getAll');
-        $this->assertEquals(6, $handler->executeProcedure('getAllA', array('p2' => 4, 'p1' => -2)));
-        $this->assertEquals(10, $handler->executeProcedure('getAllA', array('p2' => 4, 'p3' => 8, 'p1' => -2)));
-        $this->assertEquals(6, $handler->executeProcedure('getAllB', array('p1' => 4)));
-        $this->assertEquals(5, $handler->executeProcedure('getAllC', array('p1' => 3)));
+        $this->assertEquals(6, $handler->executeProcedure('getAllA', ['p2' => 4, 'p1' => -2]));
+        $this->assertEquals(10, $handler->executeProcedure('getAllA', ['p2' => 4, 'p3' => 8, 'p1' => -2]));
+        $this->assertEquals(6, $handler->executeProcedure('getAllB', ['p1' => 4]));
+        $this->assertEquals(5, $handler->executeProcedure('getAllC', ['p1' => 3]));
     }
 
     public function testBindPositionalArguments()
@@ -98,9 +98,9 @@ class ProcedureHandlerTest extends PHPUnit_Framework_TestCase
         $handler = new ProcedureHandler;
         $handler->withClassAndMethod('getAllA', 'A', 'getAll');
         $handler->withClassAndMethod('getAllB', 'B', 'getAll');
-        $this->assertEquals(6, $handler->executeProcedure('getAllA', array(4, -2)));
-        $this->assertEquals(2, $handler->executeProcedure('getAllA', array(4, 0, -2)));
-        $this->assertEquals(4, $handler->executeProcedure('getAllB', array(2)));
+        $this->assertEquals(6, $handler->executeProcedure('getAllA', [4, -2]));
+        $this->assertEquals(2, $handler->executeProcedure('getAllA', [4, 0, -2]));
+        $this->assertEquals(4, $handler->executeProcedure('getAllB', [2]));
     }
 
     public function testRegisterNamedArguments()
@@ -110,8 +110,8 @@ class ProcedureHandlerTest extends PHPUnit_Framework_TestCase
             return $p1 + $p2 + $p3;
         });
 
-        $this->assertEquals(6, $handler->executeProcedure('getAllA', array('p2' => 4, 'p1' => -2)));
-        $this->assertEquals(10, $handler->executeProcedure('getAllA', array('p2' => 4, 'p3' => 8, 'p1' => -2)));
+        $this->assertEquals(6, $handler->executeProcedure('getAllA', ['p2' => 4, 'p1' => -2]));
+        $this->assertEquals(10, $handler->executeProcedure('getAllA', ['p2' => 4, 'p3' => 8, 'p1' => -2]));
     }
 
     public function testRegisterPositionalArguments()
@@ -121,8 +121,8 @@ class ProcedureHandlerTest extends PHPUnit_Framework_TestCase
             return $p1 + $p2 + $p3;
         });
 
-        $this->assertEquals(6, $handler->executeProcedure('getAllA', array(4, -2)));
-        $this->assertEquals(2, $handler->executeProcedure('getAllA', array(4, 0, -2)));
+        $this->assertEquals(6, $handler->executeProcedure('getAllA', [4, -2]));
+        $this->assertEquals(2, $handler->executeProcedure('getAllA', [4, 0, -2]));
     }
 
     public function testTooManyArguments()
@@ -131,7 +131,7 @@ class ProcedureHandlerTest extends PHPUnit_Framework_TestCase
 
         $handler = new ProcedureHandler;
         $handler->withClassAndMethod('getAllC', new B, 'getAll');
-        $handler->executeProcedure('getAllC', array('p1' => 3, 'p2' => 5));
+        $handler->executeProcedure('getAllC', ['p1' => 3, 'p2' => 5]);
     }
 
     public function testNotEnoughArguments()

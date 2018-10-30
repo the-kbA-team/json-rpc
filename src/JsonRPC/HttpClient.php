@@ -248,12 +248,14 @@ class HttpClient
     /**
      * Do the HTTP request
      *
-     * @param  string   $payload
-     * @param  string[] $headers Headers for this request
+     * @param string   $payload
+     * @param string[] $headers Headers for this request
      *
      * @return array
      *
+     * @throws AccessDeniedException
      * @throws ConnectionFailureException
+     * @throws ServerErrorException
      */
     public function execute($payload, array $headers = [])
     {
@@ -275,7 +277,8 @@ class HttpClient
                 CURLOPT_POSTFIELDS => $payload,
                 CURLOPT_HTTPHEADER => $requestHeaders,
                 CURLOPT_HEADERFUNCTION => function ($curl, $header) use (&$headers) {
-                    $headers[] = $header;
+                    $headers[] = rtrim($header, "\r\n");
+
                     return strlen($header);
                 }
             ]);
@@ -307,9 +310,21 @@ class HttpClient
         }
 
         if ($this->debug) {
-            error_log('==> Request: '.PHP_EOL.(is_string($payload) ? $payload : json_encode($payload, JSON_PRETTY_PRINT)));
-            error_log('==> Headers: '.PHP_EOL.var_export($headers, true));
-            error_log('==> Response: '.PHP_EOL.json_encode($response, JSON_PRETTY_PRINT));
+            error_log(sprintf(
+                '==> Request: %s%s',
+                PHP_EOL,
+                (is_string($payload) ? $payload : json_encode($payload, JSON_PRETTY_PRINT))
+            ));
+            error_log(sprintf(
+                '==> Headers: %s%s',
+                PHP_EOL,
+                var_export($headers, true)
+            ));
+            error_log(sprintf(
+                '==> Response: %s%s',
+                PHP_EOL,
+                json_encode($response, JSON_PRETTY_PRINT)
+            ));
         }
 
         $this->handleExceptions($headers);

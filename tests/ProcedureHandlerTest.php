@@ -143,6 +143,15 @@ class ProcedureHandlerTest extends PHPUnit_Framework_TestCase
         $handler->executeProcedure('getAllC');
     }
 
+    public function testUndefinedArguments()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $handler = new ProcedureHandler;
+        $handler->withClassAndMethod('getAllA', new A, 'getAll');
+        $handler->executeProcedure('getAllA', ['p1' => 3, 'p2' => 5, 'p333' => 7]);
+    }
+
     public function testBeforeMethod()
     {
         $handler = new ProcedureHandler;

@@ -447,7 +447,7 @@ class HttpClient
     }
 
     /**
-     * @param string $name
+     * @param int $name
      * @param mixed $value
      */
     public function addOption($name, $value)

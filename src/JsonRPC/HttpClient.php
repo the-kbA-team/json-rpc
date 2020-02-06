@@ -315,14 +315,13 @@ class HttpClient
 
             if (false === $response) {
                 throw new ConnectionFailureException('Unable to establish a connection');
-            } elseif (200 !== $statusCode) {
-                $ex = new ResponseException('Unexpected server response!');
-                $ex->setData(['status_code' => $statusCode]);
-
-                throw $ex;
             }
 
             $response = json_decode($response, true);
+
+            if (200 !== $statusCode && !is_array($response)) {
+                throw new ResponseException(sprintf('Unexpected response: %s', $this->getError($headers)));
+            }
         } else {
             $stream = fopen(trim($this->url), 'r', false, $this->buildContext($payload, $requestHeaders));
 
@@ -330,16 +329,13 @@ class HttpClient
                 throw new ConnectionFailureException('Unable to establish a connection');
             }
 
+            $response = json_decode(stream_get_contents($stream), true);
             $metadata = stream_get_meta_data($stream);
             $headers = $metadata['wrapper_data'];
-            $response = json_decode(stream_get_contents($stream), true);
+            $error = $this->getError($headers);
 
-            $successHeader = array_filter($headers, function($value) {
-                return preg_match('/HTTP.*200\sOK/', $value);
-            });
-
-            if (empty($successHeader)) {
-                throw new ResponseException('Unexpected server response!');
+            if (null !== $error && !is_array($response)) {
+                throw new ResponseException(sprintf('Unexpected response: %s', $error));
             }
 
             fclose($stream);
@@ -520,5 +516,19 @@ class HttpClient
             $headers[] = 'Cookie: ' . implode('; ', $cookies);
         }
         return $headers;
+    }
+
+    /**
+     * @param array $headers
+     *
+     * @return string
+     */
+    protected function getError(array $headers)
+    {
+        $statuses = array_filter($headers, function($value) {
+            return preg_match('/HTTP.*(404|5\d{2})/', $value);
+        });
+
+        return empty($statuses) ? null : array_shift($statuses);
     }
 }

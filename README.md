@@ -34,6 +34,28 @@ For PHP 5.3 (last supported version):
 composer require fguillot/json-rpc 1.2.5
 ```
 
+Running Test Cases -- Optional
+--------
+
+* git clone https://github.com/matasarei/JsonRPC.git
+* cd JsonRPC
+* composer install
+* run vendor/bin/phpunit, eg:
+
+```
+$ vendor/bin/phpunit
+PHPUnit 4.8.36 by Sebastian Bergmann and contributors.
+
+................................................................. 65 / 94 ( 69%)
+.............................
+
+Time: 81 ms, Memory: 6.00MB
+
+OK (94 tests, 127 assertions)
+`
+```
+
+
 Examples
 --------
 

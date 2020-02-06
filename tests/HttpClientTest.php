@@ -49,6 +49,10 @@ function curl_close($ch) {
     HttpClientTest::$functions->curl_close($ch);
 }
 
+function curl_getinfo($ch, $option) {
+    HttpClientTest::$functions->curl_getinfo($ch, $option);
+}
+
 class HttpClientTest extends \PHPUnit_Framework_TestCase
 {
     public static $functions;
@@ -57,8 +61,10 @@ class HttpClientTest extends \PHPUnit_Framework_TestCase
     {
         self::$functions = $this
             ->getMockBuilder('stdClass')
-            ->setMethods(array('extension_loaded', 'fopen', 'stream_context_create',
-                'curl_init', 'curl_setopt_array', 'curl_setopt', 'curl_exec', 'curl_close'))
+            ->setMethods([
+                'extension_loaded', 'fopen', 'stream_context_create', 'curl_getinfo',
+                'curl_init', 'curl_setopt_array', 'curl_setopt', 'curl_exec', 'curl_close'
+            ])
             ->getMock();
     }
 
@@ -203,6 +209,11 @@ class HttpClientTest extends \PHPUnit_Framework_TestCase
 
         self::$functions
             ->expects($this->at(5))
+            ->method('curl_getinfo')
+            ->with('curl');
+
+        self::$functions
+            ->expects($this->at(6))
             ->method('curl_close')
             ->with('curl');
 

@@ -5,6 +5,7 @@ namespace JsonRPC;
 use Closure;
 use JsonRPC\Exception\AccessDeniedException;
 use JsonRPC\Exception\ConnectionFailureException;
+use JsonRPC\Exception\ResponseException;
 use JsonRPC\Exception\ServerErrorException;
 
 /**
@@ -262,6 +263,7 @@ class HttpClient
      *
      * @throws AccessDeniedException
      * @throws ConnectionFailureException
+     * @throws ResponseException
      * @throws ServerErrorException
      */
     public function execute($payload, array $headers = [])
@@ -270,9 +272,10 @@ class HttpClient
             call_user_func_array($this->beforeRequest, [$this, $payload, $headers]);
         }
 
+        $requestHeaders = $this->buildHeaders($headers);
+
         if ($this->isCurlLoaded()) {
             $ch = curl_init();
-            $requestHeaders = $this->buildHeaders($headers);
             $headers = [];
             $options = [
                 CURLOPT_URL => trim($this->url),
@@ -307,15 +310,20 @@ class HttpClient
             }
 
             $response = curl_exec($ch);
+            $statusCode = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
             curl_close($ch);
 
-            if ($response !== false) {
-                $response = json_decode($response, true);
-            } else {
+            if (false === $response) {
                 throw new ConnectionFailureException('Unable to establish a connection');
+            } elseif (200 !== $statusCode) {
+                $ex = new ResponseException('Unexpected server response!');
+                $ex->setData(['status_code' => $statusCode]);
+
+                throw $ex;
             }
+
+            $response = json_decode($response, true);
         } else {
-            $requestHeaders = $this->buildHeaders($headers);
             $stream = fopen(trim($this->url), 'r', false, $this->buildContext($payload, $requestHeaders));
 
             if (!is_resource($stream)) {
@@ -325,6 +333,14 @@ class HttpClient
             $metadata = stream_get_meta_data($stream);
             $headers = $metadata['wrapper_data'];
             $response = json_decode(stream_get_contents($stream), true);
+
+            $successHeader = array_filter($headers, function($value) {
+                return preg_match('/HTTP.*200\sOK/', $value);
+            });
+
+            if (empty($successHeader)) {
+                throw new ResponseException('Unexpected server response!');
+            }
 
             fclose($stream);
         }

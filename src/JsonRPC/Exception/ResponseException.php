@@ -42,6 +42,7 @@ class ResponseException extends RpcCallFailedException
     public function setData($data = null)
     {
         $this->data = $data;
+
         return $this;
     }
 

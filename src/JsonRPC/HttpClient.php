@@ -91,9 +91,16 @@ class HttpClient
     protected $beforeRequest;
 
     /**
+     * CURL or stream meta data options
+     *
+     * @var array
+     */
+    protected $options = [];
+
+    /**
      * HttpClient constructor
      *
-     * @param  string $url
+     * @param string $url
      */
     public function __construct($url = '')
     {
@@ -103,7 +110,7 @@ class HttpClient
     /**
      * Set URL
      *
-     * @param  string $url
+     * @param string $url
      *
      * @return $this
      */
@@ -117,7 +124,7 @@ class HttpClient
     /**
      * Set username
      *
-     * @param  string $username
+     * @param string $username
      *
      * @return $this
      */
@@ -131,7 +138,7 @@ class HttpClient
     /**
      * Set password
      *
-     * @param  string $password
+     * @param string $password
      *
      * @return $this
      */
@@ -145,7 +152,7 @@ class HttpClient
     /**
      * Set timeout
      *
-     * @param  integer $timeout
+     * @param integer $timeout
      *
      * @return $this
      */
@@ -159,7 +166,7 @@ class HttpClient
     /**
      * Set headers
      *
-     * @param  array $headers
+     * @param array $headers
      *
      * @return $this
      */
@@ -173,8 +180,8 @@ class HttpClient
     /**
      * Set cookies
      *
-     * @param  array     $cookies
-     * @param  boolean   $replace
+     * @param array $cookies
+     * @param boolean $replace
      */
     public function withCookies(array $cookies, $replace = false)
     {
@@ -224,7 +231,7 @@ class HttpClient
     /**
      * Assign a callback before the request
      *
-     * @param  Closure $closure
+     * @param Closure $closure
      *
      * @return $this
      */
@@ -248,7 +255,7 @@ class HttpClient
     /**
      * Do the HTTP request
      *
-     * @param string   $payload
+     * @param string $payload
      * @param string[] $headers Headers for this request
      *
      * @return array
@@ -267,7 +274,7 @@ class HttpClient
             $ch = curl_init();
             $requestHeaders = $this->buildHeaders($headers);
             $headers = [];
-            curl_setopt_array($ch, [
+            $options = [
                 CURLOPT_URL => trim($this->url),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_CONNECTTIMEOUT => $this->timeout,
@@ -281,7 +288,19 @@ class HttpClient
 
                     return strlen($header);
                 }
-            ]);
+            ];
+
+            $options = array_replace_recursive($options, $this->options);
+
+            if ($this->debug) {
+                error_log(sprintf(
+                    '==> CURL options: %s%s',
+                    PHP_EOL,
+                    json_encode($options, JSON_PRETTY_PRINT)
+                ));
+            }
+
+            curl_setopt_array($ch, $options);
 
             if ($this->sslLocalCert !== null) {
                 curl_setopt($ch, CURLOPT_CAINFO, $this->sslLocalCert);
@@ -299,7 +318,7 @@ class HttpClient
             $requestHeaders = $this->buildHeaders($headers);
             $stream = fopen(trim($this->url), 'r', false, $this->buildContext($payload, $requestHeaders));
 
-            if (! is_resource($stream)) {
+            if (!is_resource($stream)) {
                 throw new ConnectionFailureException('Unable to establish a connection');
             }
 
@@ -342,8 +361,8 @@ class HttpClient
     /**
      * Prepare stream context
      *
-     * @param  string   $payload
-     * @param  string[] $headers
+     * @param string $payload
+     * @param string[] $headers
      *
      * @return resource
      */
@@ -369,13 +388,15 @@ class HttpClient
             $options['ssl']['local_cert'] = $this->sslLocalCert;
         }
 
+        $options = array_replace_recursive($options, $this->options);
+
         return stream_context_create($options);
     }
 
     /**
      * Parse cookies from response
      *
-     * @param  array $headers
+     * @param array $headers
      */
     protected function parseCookies(array $headers)
     {
@@ -418,10 +439,33 @@ class HttpClient
 
         foreach ($headers as $header) {
             foreach ($exceptions as $code => $exception) {
-                if (strpos($header, 'HTTP/1.0 '.$code) !== false || strpos($header, 'HTTP/1.1 '.$code) !== false) {
-                    throw new $exception('Response: '.$header);
+                if (strpos($header, 'HTTP/1.0 ' . $code) !== false || strpos($header, 'HTTP/1.1 ' . $code) !== false) {
+                    throw new $exception('Response: ' . $header);
                 }
             }
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
+    public function addOption($name, $value)
+    {
+        $this->options[$name] = $value;
+    }
+
+    /**
+     * Set the CURL or stream meta data options
+     *
+     * @param array $options
+     */
+    public function setOptions(array $options)
+    {
+        if (is_array($options)) {
+            $this->options = $options;
+        } else {
+            $this->options = [];
         }
     }
 

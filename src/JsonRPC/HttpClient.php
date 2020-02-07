@@ -310,7 +310,6 @@ class HttpClient
             }
 
             $response = curl_exec($ch);
-            $statusCode = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
             curl_close($ch);
 
             if (false === $response) {
@@ -318,10 +317,6 @@ class HttpClient
             }
 
             $response = json_decode($response, true);
-
-            if (200 !== $statusCode && !is_array($response)) {
-                throw new ResponseException(sprintf('Unexpected response: %s', $this->getError($headers)));
-            }
         } else {
             $stream = fopen(trim($this->url), 'r', false, $this->buildContext($payload, $requestHeaders));
 
@@ -329,14 +324,9 @@ class HttpClient
                 throw new ConnectionFailureException('Unable to establish a connection');
             }
 
-            $response = json_decode(stream_get_contents($stream), true);
             $metadata = stream_get_meta_data($stream);
             $headers = $metadata['wrapper_data'];
-            $error = $this->getError($headers);
-
-            if (null !== $error && !is_array($response)) {
-                throw new ResponseException(sprintf('Unexpected response: %s', $error));
-            }
+            $response = json_decode(stream_get_contents($stream), true);
 
             fclose($stream);
         }
@@ -364,7 +354,7 @@ class HttpClient
             ));
         }
 
-        $this->handleExceptions($headers);
+        $this->handleExceptions($headers, is_array($response));
         $this->parseCookies($headers);
 
         return $response;
@@ -435,18 +425,20 @@ class HttpClient
      * Throw an exception according the HTTP response
      *
      * @param array $headers
+     * @param bool $isJsonResponse
      *
      * @throws AccessDeniedException
      * @throws ConnectionFailureException
      * @throws ServerErrorException
+     * @throws ResponseException
      */
-    public function handleExceptions(array $headers)
+    public function handleExceptions(array $headers, $isJsonResponse = false)
     {
         $exceptions = [
             '401' => '\JsonRPC\Exception\AccessDeniedException',
             '403' => '\JsonRPC\Exception\AccessDeniedException',
             '404' => '\JsonRPC\Exception\ConnectionFailureException',
-            '500' => '\JsonRPC\Exception\ServerErrorException',
+            '500' => '\JsonRPC\Exception\ServerErrorException'
         ];
 
         foreach ($headers as $header) {
@@ -455,6 +447,18 @@ class HttpClient
                     throw new $exception('Response: ' . $header);
                 }
             }
+        }
+
+        if ($isJsonResponse) {
+            return;
+        }
+
+        $errors = array_filter($headers, function($value) {
+            return preg_match('/HTTP.*[4-5]\d{2}\s\w/', $value);
+        });
+
+        if (!empty($errors)) {
+            throw new ResponseException(sprintf('Unexpected response: %s', current($errors)));
         }
     }
 
@@ -515,20 +519,7 @@ class HttpClient
 
             $headers[] = 'Cookie: ' . implode('; ', $cookies);
         }
+
         return $headers;
-    }
-
-    /**
-     * @param array $headers
-     *
-     * @return string
-     */
-    protected function getError(array $headers)
-    {
-        $statuses = array_filter($headers, function($value) {
-            return preg_match('/HTTP.*(404|5\d{2})/', $value);
-        });
-
-        return empty($statuses) ? null : array_shift($statuses);
     }
 }

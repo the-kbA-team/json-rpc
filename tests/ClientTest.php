@@ -1,18 +1,19 @@
 <?php
 
 use JsonRPC\Client;
+use PHPUnit\Framework\TestCase;
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-class ClientTest extends PHPUnit_Framework_TestCase
+class ClientTest extends TestCase
 {
     private $httpClient;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->httpClient = $this
             ->getMockBuilder('\JsonRPC\HttpClient')
-            ->setMethods(array('execute'))
+            ->setMethods(['execute'])
             ->getMock();
     }
 
@@ -44,7 +45,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
             ->execute('methodB', ['a' => 'b'])
             ->send();
 
-        $this->assertEquals(array('c', 'd'), $result);
+        $this->assertEquals(['c', 'd'], $result);
     }
 
     public function testSendRequest()
@@ -55,7 +56,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('execute')
             ->with($this->stringContains('{"jsonrpc":"2.0","method":"methodA","id":'))
-            ->will($this->returnValue(array('jsonrpc' => '2.0', 'result' => 'foobar', 'id' => 1)));
+            ->will($this->returnValue(['jsonrpc' => '2.0', 'result' => 'foobar', 'id' => 1]));
 
         $result = $client->execute('methodA', ['a' => 'b']);
         $this->assertEquals($result, 'foobar');
@@ -77,7 +78,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
                 ],
             ]));
 
-        $this->setExpectedException('BadFunctionCallException');
+        $this->expectException('BadFunctionCallException');
         $client->execute('methodA', ['a' => 'b']);
     }
 

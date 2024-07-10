@@ -36,6 +36,22 @@ class ClassWithBeforeMethod
     }
 }
 
+class ClassWithArgsTransformMethod
+{
+    public static string $foobar = '';
+
+    public function transform($procedure, $args): array
+    {
+        $args[0] .= self::$foobar;
+        return $args;
+    }
+
+    public function getAll($arg1)
+    {
+        return $arg1;
+    }
+}
+
 class ProcedureHandlerTest extends TestCase
 {
     public function testProcedureNotFound()
@@ -160,5 +176,14 @@ class ProcedureHandlerTest extends TestCase
         $handler->withObject(new ClassWithBeforeMethod());
         $handler->withBeforeMethod('before');
         $this->assertEquals('myProcedure', $handler->executeProcedure('myProcedure'));
+    }
+
+    public function testArgTranformMethod()
+    {
+        $handler = new ProcedureHandler();
+        ClassWithArgsTransformMethod::$foobar = 'o';
+        $handler->withObject(new ClassWithArgsTransformMethod());
+        $handler->withArgsTransformMethod('transform');
+        $this->assertEquals('hello', $handler->executeProcedure('getAll', ['hell']));
     }
 }

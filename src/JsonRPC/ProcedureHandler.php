@@ -45,6 +45,13 @@ class ProcedureHandler
     protected $beforeMethodName = '';
 
     /**
+     * Procedure arguments transformation method to call
+     *
+     * @var string
+     */
+    protected $argsTransformMethod = '';
+
+    /**
      * Register a new procedure
      *
      * @param  string   $procedure       Procedure name
@@ -104,6 +111,17 @@ class ProcedureHandler
     {
         $this->beforeMethodName = $methodName;
 
+        return $this;
+    }
+
+    /**
+     * Procedure arguments transformation method to call.
+     * @param $methodName
+     * @return $this
+     */
+    public function withArgsTransformMethod($methodName)
+    {
+        $this->argsTransformMethod = $methodName;
         return $this;
     }
 
@@ -218,6 +236,12 @@ class ProcedureHandler
             $reflection->getNumberOfParameters()
         );
 
+        /**
+         * Execute procedure arguments transformation method before invoking
+         *  the procedure.
+         */
+        $arguments = $this->executeArgsTransformMethod($instance, $method, $arguments);
+
         return $reflection->invokeArgs($instance, $arguments);
     }
 
@@ -232,6 +256,25 @@ class ProcedureHandler
         if ($this->beforeMethodName !== '' && method_exists($object, $this->beforeMethodName)) {
             call_user_func_array([$object, $this->beforeMethodName], [$method]);
         }
+    }
+
+    /**
+     * Execute procedure arguments transformation method before invoking
+     *  the procedure.
+     * @param mixed $object
+     * @param string $method
+     * @param array<int|string, mixed> $arguments
+     * @return array<int|string, mixed>
+     */
+    public function executeArgsTransformMethod($object, $method, $arguments)
+    {
+        if ($this->argsTransformMethod !== '' && method_exists($object, $this->argsTransformMethod)) {
+            $arguments = call_user_func_array([$object, $this->argsTransformMethod], [$method, $arguments]);
+            if ($arguments === false) {
+                throw new BadFunctionCallException('Unable to transform procedure arguments!');
+            }
+        }
+        return $arguments;
     }
 
     /**

@@ -135,7 +135,7 @@ class Client
     /**
      * Send a batch request
      *
-     * @return Exception|Client
+     * @return array|Exception|null
      *
      * @throws Exception
      */
@@ -155,7 +155,7 @@ class Client
      * @param  string|null $requestId Request Id
      * @param  string[]    $headers   Headers for this request
      *
-     * @return $this|Exception|Client
+     * @return $this|Exception|Client|array|null
      *
      * @throws Exception
      */
@@ -183,7 +183,7 @@ class Client
      * @param  string   $payload
      * @param  string[] $headers
      *
-     * @return Exception|Client
+     * @return array|Exception|null
      *
      * @throws Exception
      */
